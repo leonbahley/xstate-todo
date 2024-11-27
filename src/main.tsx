@@ -1,10 +1,12 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { createRoot } from "react-dom/client";
+import { createActorContext } from "@xstate/react";
+import App from "./App.tsx";
+import { todoMachine } from "./machines/todoMachines.ts";
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+export const TodosContext = createActorContext(todoMachine);
+
+createRoot(document.getElementById("root")!).render(
+  <TodosContext.Provider>
     <App />
-  </StrictMode>,
-)
+  </TodosContext.Provider>
+);
