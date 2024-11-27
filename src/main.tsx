@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { createActorContext } from "@xstate/react";
 import App from "./App.tsx";
-import { todoMachine } from "./machines/todoMachines.ts";
+import { todoMachine } from "./machines/todoMachine.ts";
 
 export const TodosContext = createActorContext(todoMachine);
 
