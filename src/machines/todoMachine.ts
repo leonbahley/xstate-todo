@@ -1,27 +1,30 @@
-import { assign, setup } from "xstate";
+import { assign, setup, assertEvent } from "xstate";
 
 export const todoMachine = setup({
   types: {
     context: {} as { todos: string[]; updatingTodoIndex: number | undefined },
     events: {} as
-      | { type: "Add todo" }
-      | { type: "Delete todo" }
-      | { type: "Start update" }
-      | { type: "Update todo" },
+      | { type: "Add todo"; todo: string }
+      | { type: "Delete todo"; todo: string }
+      | { type: "Start update"; updatingTodoIndex: number }
+      | { type: "Update todo"; todo: { index: number; todo: string } },
   },
   actions: {
     addTodo: assign({
       todos: ({ context, event }) => {
+        assertEvent(event, "Add todo");
         return [...context.todos, event.todo];
       },
     }),
     deleteTodo: assign({
       todos: ({ context, event }) => {
+        assertEvent(event, "Delete todo");
         return context.todos.filter((item) => item !== event.todo);
       },
     }),
     updateTodo: assign({
       todos: ({ context, event }) => {
+        assertEvent(event, "Update todo");
         return context.todos.map((item, i) => {
           if (i === event.todo.index) {
             return event.todo.todo;
@@ -31,11 +34,15 @@ export const todoMachine = setup({
       },
     }),
     setUpdatingTodoIndex: assign({
-      updatingTodoIndex: ({ context, event }) => event.updatingTodoIndex,
+      updatingTodoIndex: ({ event }) => {
+        assertEvent(event, "Start update");
+        return event.updatingTodoIndex;
+      },
     }),
   },
   guards: {
     isValidAdd: ({ context, event }) => {
+      assertEvent(event, "Add todo");
       const isItemInArray = context.todos.includes(event.todo);
       if (isItemInArray) {
         alert("Item present");
@@ -43,6 +50,7 @@ export const todoMachine = setup({
       return !isItemInArray;
     },
     isValidUpdate: ({ context, event }) => {
+      assertEvent(event, "Update todo");
       const isItemInArray = context.todos.includes(event.todo.todo);
       if (isItemInArray) {
         alert("Item present");
